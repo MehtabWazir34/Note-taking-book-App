@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Note Book App</title>
+</head>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center">
+  <div class="container bg-blue-300 w-full max-w-2xl p-6 rounded-lg shadow-xl space-y-4">
+    <h2 class="text-3xl font-extrabold text-gray-900 hover:text-blue-700 transition-all duration-300">📝 My Note Book</h2>
+
+    <div class="space-y-2">
+      <label for="title" class="text-lg font-semibold text-gray-800">Title <span class="text-red-600">*</span></label>
+      <input
+        type="text"
+        id="title"
+        class="inTitle w-full px-4 py-2 rounded border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg font-semibold transition-all"
+        placeholder="Write title (Required)"
+        required
+      />
+    </div>
+
+    <div class="space-y-2">
+      <label for="description" class="text-lg font-semibold text-gray-800">Description</label>
+      <input
+        type="text"
+        id="description"
+        class="description w-full px-4 py-2 rounded border border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base transition-all"
+        placeholder="Write detail description here (Optional)"
+      />
+    </div>
+
+    <button
+      class="addTask bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-2xl transition-all duration-300 hover:scale-105 shadow-md"
+    >
+      ➕ Add Note
+    </button>
+
+    <ul class="taskList space-y-3 pt-4"></ul>
+  </div>
+
+  <script>
+    const inTitle = document.querySelector(".inTitle");
+    const description = document.querySelector(".description");
+    const addBtn = document.querySelector(".addTask");
+    const taskContainer = document.querySelector(".taskList");
+
+    function addFun() {
+      let titleVal = inTitle.value.trim();
+
+      if (!titleVal) {
+        alert("Title is required!");
+        return;
+      }
+
+      const ulDiv = document.createElement("div");
+      ulDiv.className =
+        "rounded-md bg-gray-200 shadow-md p-3 border-l-4 border-blue-700 hover:shadow-xl transition-all duration-300";
+
+      const newLi = document.createElement("li");
+      newLi.innerText = titleVal;
+      newLi.className =
+        "flex justify-between items-center bg-green-400 font-bold border-b border-black text-[18px] px-3 py-2 rounded hover:bg-green-500 hover:shadow-md transition-all duration-200 cursor-pointer";
+
+      const deleteSpan = document.createElement("span");
+      deleteSpan.innerHTML = "\u00d7";
+      deleteSpan.className =
+        "delete-btn text-white text-[22px] w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 hover:bg-red-600 hover:scale-110 cursor-pointer transition-all duration-300";
+      deleteSpan.title = "Delete this task";
+
+      const pofDescription = document.createElement("p");
+      pofDescription.innerText = description.value;
+      pofDescription.className = "text-[16px] mt-2 px-2 text-gray-800";
+
+      const detInfo = document.createElement("p");
+      detInfo.className = "text-[12px] text-gray-600 italic mt-1 px-2";
+
+      const now = new Date();
+      const currDate = now.toLocaleDateString();
+      const currTime = `${now.getHours()}:${now.getMinutes().toString().padStart(2, "0")}`;
+      detInfo.textContent = `🕒 Added on: ${currDate} at ${currTime}`;
+
+      newLi.appendChild(deleteSpan);
+      ulDiv.appendChild(newLi);
+      if (pofDescription.innerText.trim()) ulDiv.appendChild(pofDescription);
+      ulDiv.appendChild(detInfo);
+      taskContainer.appendChild(ulDiv);
+
+      saveData();
+
+      inTitle.value = "";
+      description.value = "";
+    }
+
+    function checkIt(xClick) {
+      xClick.classList.toggle("line-through");
+      xClick.classList.toggle("text-gray-700");
+    }
+
+    taskContainer.addEventListener("click", (x) => {
+      const xClick = x.target;
+
+      if (xClick.classList.contains("delete-btn")) {
+        xClick.closest("div").remove();
+        saveData();
+        return;
+      }
+
+      if (xClick.tagName === "LI") {
+        if (!xClick.classList.contains("delete-btn")) {
+          checkIt(xClick);
+          saveData();
+        }
+      }
+    });
+
+    function saveData() {
+      localStorage.setItem("saveTasks", taskContainer.innerHTML);
+    }
+
+    function getData() {
+      taskContainer.innerHTML = localStorage.getItem("saveTasks");
+    }
+
+    addBtn.addEventListener("click", addFun);
+    window.onload = getData;
+  </script>
+</body>
+</html>
